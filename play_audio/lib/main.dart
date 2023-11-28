@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 void main() {
-  runApp(AudioApp());
+  runApp(const AudioApp());
 }
 
 class AudioApp extends StatelessWidget {
@@ -27,6 +27,8 @@ class HomePage extends StatelessWidget {
     'I am ok(ro)'
   ];
   final AudioPlayer audioPlayer = AudioPlayer();
+
+  HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +83,7 @@ class HomePage extends StatelessWidget {
     'i_am_ok.mp3',
     'i_am_ok(ro).mp3'
   ];
+
   void playAudio(int i) async {
     audioPlayer.audioCache = player;
     await audioPlayer.play(AssetSource(audioList[i]));
