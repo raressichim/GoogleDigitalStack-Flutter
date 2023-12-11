@@ -1,0 +1,1 @@
+ C:\\Users\\rares\\Desktop\\flutter\\GoogleDigitalStack-Flutter\\infinite_list_view\\.dart_tool\\flutter_build\\5ee994d1c1a1d117afd4b189142f9024\\native_assets.yaml: 

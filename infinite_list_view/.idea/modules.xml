@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/android/infinite_list_view_android.iml" filepath="$PROJECT_DIR$/android/infinite_list_view_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/unsplashed_photo_gallery.iml" filepath="$PROJECT_DIR$/unsplashed_photo_gallery.iml" />
+    </modules>
+  </component>
+</project>
