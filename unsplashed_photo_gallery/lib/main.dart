@@ -27,6 +27,7 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final List<Photo> items = <Photo>[];
   bool isLoading = true;
+  int page = 1;
 
   @override
   void initState() {
@@ -38,8 +39,9 @@ class HomePageState extends State<HomePage> {
     final Client client = Client();
 
     final Response response = await client.get(
-        Uri.parse('https://api.unsplash.com/photos'),
-        headers: <String, String>{'Authorization': 'Client-ID $accessKey'});
+      Uri.parse('https://api.unsplash.com/photos?page=$page'),
+      headers: <String, String>{'Authorization': 'Client-ID $accessKey'},
+    );
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
@@ -47,6 +49,7 @@ class HomePageState extends State<HomePage> {
       for (final dynamic item in data) {
         items.add(Photo(item as Map<String, dynamic>));
       }
+
       setState(() {
         isLoading = false;
       });
@@ -57,36 +60,46 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scrollable List'),
+        title: const Text('Photo Gallery'),
       ),
-      body: Stack(
-        children: <Widget>[
-          GridView.builder(
-            itemCount: items.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8.0,
-              crossAxisSpacing: 8.0,
-            ),
-            itemBuilder: (BuildContext context, int index) {
-              if (index == items.length - 1 && !isLoading) {
-                loadItems();
-              }
-              return Center(
-                child: GridTile(
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (!isLoading &&
+              scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            setState(() {
+              isLoading = true;
+              page++;
+            });
+            loadItems();
+            return true;
+          }
+          return false;
+        },
+        child: Stack(
+          children: <Widget>[
+            GridView.builder(
+              itemCount: items.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                childAspectRatio: 0.7,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return GridTile(
                   child: Image.network(
                     items[index].imageUrl,
                     fit: BoxFit.cover,
                   ),
-                ),
-              );
-            },
-          ),
-          if (isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
+                );
+              },
             ),
-        ],
+            if (isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -94,16 +107,14 @@ class HomePageState extends State<HomePage> {
 
 class Photo {
   Photo(Map<String, dynamic> json)
-      : description = json['description'] as String? ?? '',
-        imageUrl =
+      : imageUrl =
             ((json['urls'] as Map<String, dynamic>?)?['regular'] as String?) ??
                 '';
 
-  final String description;
   final String imageUrl;
 
   @override
   String toString() {
-    return 'Photo{description: $description, imageUrl: $imageUrl}';
+    return 'Photo{imageUrl: $imageUrl}';
   }
 }
