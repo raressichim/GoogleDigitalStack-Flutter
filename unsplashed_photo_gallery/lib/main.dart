@@ -28,6 +28,7 @@ class HomePageState extends State<HomePage> {
   final List<Photo> items = <Photo>[];
   bool isLoading = true;
   int page = 1;
+  String searchString = 'photos';
 
   @override
   void initState() {
@@ -39,14 +40,17 @@ class HomePageState extends State<HomePage> {
     final Client client = Client();
 
     final Response response = await client.get(
-      Uri.parse('https://api.unsplash.com/photos?page=$page'),
+      Uri.parse(
+          'https://api.unsplash.com/search/photos?page=$page&query=$searchString'),
       headers: <String, String>{'Authorization': 'Client-ID $accessKey'},
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+      final Map<String, dynamic> data =
+          jsonDecode(response.body) as Map<String, dynamic>;
+      final List<dynamic> results = data['results'] as List<dynamic>;
 
-      for (final dynamic item in data) {
+      for (final dynamic item in results) {
         items.add(Photo(item as Map<String, dynamic>));
       }
 
@@ -61,45 +65,70 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Photo Gallery'),
+        backgroundColor: Colors.blue,
       ),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification scrollInfo) {
-          if (!isLoading &&
-              scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            setState(() {
-              isLoading = true;
-              page++;
-            });
-            loadItems();
-            return true;
-          }
-          return false;
-        },
-        child: Stack(
-          children: <Widget>[
-            GridView.builder(
-              itemCount: items.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                childAspectRatio: 0.7,
-              ),
-              itemBuilder: (BuildContext context, int index) {
-                return GridTile(
-                  child: Image.network(
-                    items[index].imageUrl,
-                    fit: BoxFit.cover,
-                  ),
-                );
+      body: Column(
+        children: <Widget>[
+          TextField(
+            onChanged: (String value) {
+              setState(() {
+                searchString = value;
+                isLoading = true;
+                items.clear();
+              });
+            },
+            onSubmitted: (String value) {
+              setState(() {
+                page = 1;
+                loadItems();
+              });
+            },
+            decoration: const InputDecoration(hintText: 'Search'),
+          ),
+          Expanded(
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (!isLoading &&
+                    scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent) {
+                  setState(() {
+                    isLoading = true;
+                    page++;
+                  });
+                  loadItems();
+                  return true;
+                }
+                return false;
               },
-            ),
-            if (isLoading)
-              const Center(
-                child: CircularProgressIndicator(),
+              child: Stack(
+                children: <Widget>[
+                  GridView.builder(
+                    itemCount: items.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 8.0,
+                      crossAxisSpacing: 8.0,
+                      childAspectRatio: 0.7,
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      return GridTile(
+                        child: Image.network(
+                          items[index].imageUrl,
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  ),
+                  if (isLoading)
+                    const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
