@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1056183951157",
+    "project_id": "photogallery-dfcf2",
+    "storage_bucket": "photogallery-dfcf2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056183951157:android:1933b7b7faa7a474b6367c",
+        "android_client_info": {
+          "package_name": "com.example.unsplashed_photo_gallery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXJnriew7Pn4yOo3gtvpU_aL1DSjUies8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
